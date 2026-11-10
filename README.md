@@ -1,45 +1,43 @@
-# RelayHub 🔄
+<p align="center">
+  <img src="assets/banner.svg" alt="Hookwire Banner" width="100%">
+</p>
 
-[![CI](https://github.com/Gaurav28-tech/relay-hub/actions/workflows/ci.yml/badge.svg)](https://github.com/Gaurav28-tech/relay-hub)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Python: 3.9+](https://img.shields.io/badge/Python-3.9+-brightgreen.svg)]()
+<p align="center">
+  <a href="https://github.com/Gaurav28-tech/hookwire/actions"><img src="https://github.com/Gaurav28-tech/hookwire/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License"></a>
+  <img src="https://img.shields.io/badge/Python-3.9+-brightgreen.svg" alt="Python Version">
+  <img src="https://img.shields.io/badge/Delivery-Guaranteed%20Retry-emerald" alt="Delivery">
+</p>
 
-**RelayHub** is a resilient webhook delivery and ingestion pipeline built for high-throughput event-driven microservices. It safeguards webhooks against replay attacks using cryptographic HMAC signatures, enforces idempotent execution, and guarantees at-least-once delivery with exponential backoff and Dead-Letter Queue (DLQ) support.
+<p align="center">
+  <b>Hookwire</b> is a resilient webhook delivery and ingestion pipeline built for event-driven microservices. It safeguards webhooks against replay attacks using cryptographic HMAC signatures, enforces idempotent execution, and guarantees at-least-once delivery with exponential backoff and Dead-Letter Queue (DLQ) support.
+</p>
 
 ---
 
-## 🚀 Key Features
+## ⚡ Live Terminal Preview
 
-- **HMAC-SHA256 Signatures**: Generates and verifies cryptographic signatures with constant-time comparison to prevent timing and spoofing attacks.
-- **Idempotency Guard**: Sliding TTL memory store ensuring incoming duplicate webhook deliveries are rejected safely.
-- **Exponential Backoff & Jitter**: Automated delivery retries with exponential backoff and jitter calculations.
-- **Dead-Letter Queue (DLQ)**: Exhausted delivery attempts are automatically isolated to a persistent DLQ for inspection and manual replay.
-- **Pure Python**: Zero third-party dependencies required.
+<p align="center">
+  <img src="assets/demo.gif" alt="Hookwire Terminal Demo" width="100%">
+</p>
+
+---
+
+## 🚀 Key Capabilities
+
+- **HMAC-SHA256 Signatures**: Generates and verifies cryptographic signatures with constant-time comparison to prevent timing attacks.
+- **Idempotency Guard**: Sliding TTL memory store ensuring incoming duplicate webhook deliveries are safely rejected.
+- **Exponential Backoff**: Automated delivery retries with exponential backoff and jitter calculations.
+- **Dead-Letter Queue (DLQ)**: Exhausted delivery attempts are automatically isolated to a persistent DLQ for inspection.
+- **Zero Heavy Dependencies**: Pure standard library Python with zero broker dependencies.
 
 ---
 
 ## 🏗️ Architecture
 
-```
-Incoming / Outgoing Webhook Event
-              |
-              v
-     [HMAC Verifier]  ---> (Reject invalid signatures)
-              |
-     [Idempotency Check] ---> (Deduplicate repeated delivery)
-              |
-     [Delivery Pipeline]
-              |
-      +-------+-------+
-      | (Success)     | (Failure / Timeout)
-      v               v
-  (200 OK)    [Exponential Backoff Retry Queue]
-                      |
-              +-------+-------+
-              | (Retry < Max) | (Retry >= Max)
-              v               v
-          (Re-queue)      [Dead Letter Queue (DLQ)]
-```
+<p align="center">
+  <img src="assets/architecture.svg" alt="Hookwire Architecture" width="100%">
+</p>
 
 ---
 
@@ -48,8 +46,8 @@ Incoming / Outgoing Webhook Event
 ### Installation
 
 ```bash
-git clone https://github.com/Gaurav28-tech/relay-hub.git
-cd relay-hub
+git clone https://github.com/Gaurav28-tech/hookwire.git
+cd hookwire
 ```
 
 ### Basic Usage
@@ -59,7 +57,7 @@ from relay.verifier import SignatureVerifier
 from relay.queue import RetryQueue
 from relay.models import WebhookEvent
 
-# 1. Sign and Verify Webhooks
+# Sign and verify incoming webhook payloads
 secret = "whsec_supersecretkey123"
 payload = '{"event": "payment.succeeded", "amount": 4900}'
 sig = SignatureVerifier.sign(payload, secret)
@@ -67,17 +65,13 @@ sig = SignatureVerifier.sign(payload, secret)
 is_valid = SignatureVerifier.verify(payload, sig, secret)
 print(f"Signature Valid: {is_valid}")
 
-# 2. Queue with Exponential Backoff
+# Queue for resilient delivery with exponential backoff
 queue = RetryQueue(max_retries=3, base_backoff_seconds=1.0)
-event = WebhookEvent(
-    id="evt_001",
-    target_url="https://api.partner.com/webhook",
-    payload=payload
-)
+event = WebhookEvent(id="evt_001", target_url="https://api.partner.com/webhook", payload=payload)
 queue.enqueue(event)
 ```
 
-### Running Tests
+### Running Test Suite
 
 ```bash
 python -m unittest discover -s tests -p "test_*.py"
