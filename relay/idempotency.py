@@ -1,5 +1,5 @@
 import time
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Any
 
 class IdempotencyGuard:
     def __init__(self, ttl_seconds: float = 300.0):
